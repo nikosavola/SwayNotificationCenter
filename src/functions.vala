@@ -280,14 +280,14 @@ namespace SwayNotificationCenter {
         public delegate bool FilterFunc (char character);
 
         public static string filter_string (string body, FilterFunc func) {
-            string result = "";
+            var result = new StringBuilder ();
             foreach (char char in (char[]) body.data) {
                 if (!func (char)) {
                     continue;
                 }
-                result += char.to_string ();
+                result.append_c (char);
             }
-            return result;
+            return result.str;
         }
 
         public static async bool execute_command (string cmd, string[] env_additions = {},
@@ -300,12 +300,7 @@ namespace SwayNotificationCenter {
                     spawn_env += additions;
                 }
 
-                string[] argvp;
-                Shell.parse_argv ("/bin/sh -c \"%s\"".printf (cmd), out argvp);
-
-                if (argvp[0].has_prefix ("~")) {
-                    argvp[0] = Environment.get_home_dir () + argvp[0].substring (1);
-                }
+                string[] argvp = { "/bin/sh", "-c", cmd };
 
                 Pid child_pid;
                 int std_output;
