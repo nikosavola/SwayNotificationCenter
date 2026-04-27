@@ -336,8 +336,8 @@ namespace SwayNotificationCenter {
                     }
 
                     if (!ConfigModel.instance.script_fail_notify) {
-                        warning (
-                            "Failed to run script: \"%s\" with exec: \"%s\"",
+                        stderr.printf (
+                            "Failed to run script: \"%s\" with exec: \"%s\"\n",
                             key, script.exec);
                     } else {
                         // Send notification with error message
@@ -361,8 +361,8 @@ namespace SwayNotificationCenter {
                                                    _hints,
                                                    -1);
                         } catch (Error e) {
-                            critical ("Notifying script-fail error: %s",
-                                       e.message);
+                            stderr.printf ("NOTIFING SCRIPT-FAIL ERROR: %s\n",
+                                           e.message);
                         }
                     }
                 });

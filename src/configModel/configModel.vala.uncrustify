@@ -137,7 +137,7 @@ namespace SwayNotificationCenter {
                 try {
                     cached_regex = new Regex (pattern, flags);
                 } catch (RegexError e) {
-                    warning ("Failed to compile regex '%s': %s", pattern, e.message);
+                    stderr.printf ("Failed to compile regex '%s': %s\n", pattern, e.message);
                     return false;
                 }
             }
@@ -347,24 +347,24 @@ namespace SwayNotificationCenter {
             switch (this) {
                 default :
                 return "enabled";
-                case MUTED:
+                case MUTED :
                     return "muted";
-                case IGNORED:
+                case IGNORED :
                     return "ignored";
-                case TRANSIENT:
+                case TRANSIENT :
                     return "transient";
             }
         }
 
         public static NotificationStatusEnum from_value (string value) {
             switch (value) {
-                default:
-                    return ENABLED;
-                case "muted":
+                default :
+                return ENABLED;
+                case "muted" :
                     return MUTED;
-                case "ignored":
+                case "ignored" :
                     return IGNORED;
-                case "transient":
+                case "transient" :
                     return TRANSIENT;
             }
         }
@@ -382,9 +382,9 @@ namespace SwayNotificationCenter {
 
         public string to_string () {
             switch (this) {
-                case LOW:
+                case LOW :
                     return "Low";
-                case NORMAL:
+                case NORMAL :
                     return "Normal";
                 case CRITICAL:
                     return "Critical";
@@ -534,12 +534,12 @@ namespace SwayNotificationCenter {
         }
 
         /**
-         * Whether or not the windows should be opened as layer-shell surfaces
+         * Wether or not the windows should be opened as layer-shell surfaces
          */
         public bool layer_shell { get; set; default = true; }
 
         /**
-         * Whether or not the windows should cover the whole screen when
+         * Wether or not the windows should cover the whole screen when
          * layer-shell is used.
          */
         public bool layer_shell_cover_screen { get; set; default = true; }
@@ -1028,7 +1028,8 @@ namespace SwayNotificationCenter {
             var tmp_table = new OrderedHashTable<T> ();
 
             if (node.get_node_type () != Json.NodeType.OBJECT) {
-                warning ("Node %s is not a json object!", property_name);
+                stderr.printf ("Node %s is not a json object!...\n",
+                               property_name);
                 return tmp_table;
             }
 
@@ -1156,7 +1157,7 @@ namespace SwayNotificationCenter {
                         break;
                     case Type.BOXED :
                         switch (typeof (T).name ()) {
-                            case "JsonObject":
+                            case "JsonObject" :
                                 json_object.set_object_member (key,
                                                                (Json.Object) item);
                                 break;
@@ -1187,7 +1188,8 @@ namespace SwayNotificationCenter {
             GenericArray<T> tmp_array = new GenericArray<T> ();
 
             if (node.get_node_type () != Json.NodeType.ARRAY) {
-                warning ("Node %s is not a json array!", property_name);
+                stderr.printf ("Node %s is not a json array!...\n",
+                               property_name);
                 return tmp_array;
             }
 
@@ -1361,7 +1363,7 @@ namespace SwayNotificationCenter {
                     FileCreateFlags.REPLACE_DESTINATION,
                     null);
             } catch (Error e) {
-                warning ("%s", e.message);
+                stderr.printf (e.message + "\n");
                 return false;
             }
         }

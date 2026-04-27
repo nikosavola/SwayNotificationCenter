@@ -26,24 +26,6 @@ namespace SwayNotificationCenter {
             hash_table.insert (key, value);
         }
 
-        public bool contains (string key) {
-            return hash_table.contains (key);
-        }
-
-        public bool remove (string key) {
-            if (!hash_table.contains (key)) {
-                return false;
-            }
-            hash_table.remove (key);
-            order.remove (key);
-            return true;
-        }
-
-        public void clear () {
-            hash_table.remove_all ();
-            order = new List<string> ();
-        }
-
         public List<weak string> get_keys () {
             return order.copy ();
         }

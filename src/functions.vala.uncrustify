@@ -52,7 +52,7 @@ namespace SwayNotificationCenter {
                     Gdk.Texture texture = Gdk.Texture.for_pixbuf (pixbuf);
                     img.set_from_paintable (texture);
                 } catch (Error e) {
-                    warning ("%s", e.message);
+                    stderr.printf (e.message + "\n");
                 }
             }
 
@@ -158,8 +158,8 @@ namespace SwayNotificationCenter {
                 }
             }
             if (path == "") {
-                critical (
-                    "COULD NOT FIND CSS FILE! REINSTALL THE PACKAGE!");
+                stderr.printf (
+                    "COULD NOT FIND CSS FILE! REINSTALL THE PACKAGE!\n");
                 Process.exit (1);
             }
             return path;
@@ -200,8 +200,8 @@ namespace SwayNotificationCenter {
                 }
             }
             if (path == "") {
-                critical (
-                    "COULD NOT FIND CONFIG FILE! REINSTALL THE PACKAGE!");
+                stderr.printf (
+                    "COULD NOT FIND CONFIG FILE! REINSTALL THE PACKAGE!\n");
                 Process.exit (1);
             }
             return path;
@@ -280,14 +280,14 @@ namespace SwayNotificationCenter {
         public delegate bool FilterFunc (char character);
 
         public static string filter_string (string body, FilterFunc func) {
-            var result = new StringBuilder ();
+            string result = "";
             foreach (char char in (char[]) body.data) {
                 if (!func (char)) {
                     continue;
                 }
-                result.append_c (char);
+                result += char.to_string ();
             }
-            return result.str;
+            return result;
         }
 
         public static async bool execute_command (string cmd, string[] env_additions = {},
@@ -300,7 +300,12 @@ namespace SwayNotificationCenter {
                     spawn_env += additions;
                 }
 
-                string[] argvp = { "/bin/sh", "-c", cmd };
+                string[] argvp;
+                Shell.parse_argv ("/bin/sh -c \"%s\"".printf (cmd), out argvp);
+
+                if (argvp[0].has_prefix ("~")) {
+                    argvp[0] = Environment.get_home_dir () + argvp[0].substring (1);
+                }
 
                 Pid child_pid;
                 int std_output;

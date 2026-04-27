@@ -117,10 +117,10 @@ namespace SwayNotificationCenter {
                 }
             },
                                         () => {
-                critical (
+                stderr.printf (
                     "Could not acquire notification name. " +
                     "Please close any other notification daemon " +
-                    "like mako or dunst");
+                    "like mako or dunst\n");
                 Process.exit (1);
             });
             yield;
