@@ -113,97 +113,103 @@ namespace SwayNotificationCenter {
 
         private const RegexMatchFlags REGEX_MATCH_FLAGS = RegexMatchFlags.NOTEMPTY;
 
-        public virtual bool matches_notification (NotifyParams param) {
-            if (app_name != null) {
-                if (param.app_name == null) {
-                    return false;
+        // Cached compiled regexes — lazily built on first match
+        private Regex ?_app_name_regex = null;
+        private Regex ?_desktop_entry_regex = null;
+        private Regex ?_summary_regex = null;
+        private Regex ?_body_regex = null;
+        private Regex ?_urgency_regex = null;
+        private Regex ?_category_regex = null;
+        private Regex ?_sound_name_regex = null;
+        private Regex ?_sound_file_regex = null;
+        private bool _regexes_compiled = false;
+
+        private void ensure_regexes () {
+            if (_regexes_compiled) {
+                return;
+            }
+            _regexes_compiled = true;
+            try {
+                if (app_name != null) {
+                    _app_name_regex = new Regex (app_name, REGEX_COMPILE_OPTIONS);
                 }
-                bool result = Regex.match_simple (
-                    app_name, param.app_name,
-                    REGEX_COMPILE_OPTIONS,
-                    REGEX_MATCH_FLAGS);
-                if (!result) {
+                if (desktop_entry != null) {
+                    _desktop_entry_regex = new Regex (desktop_entry, REGEX_COMPILE_OPTIONS);
+                }
+                if (summary != null) {
+                    _summary_regex = new Regex (summary, REGEX_COMPILE_OPTIONS);
+                }
+                if (body != null) {
+                    _body_regex = new Regex (body);
+                }
+                if (urgency != null) {
+                    _urgency_regex = new Regex (urgency, REGEX_COMPILE_OPTIONS);
+                }
+                if (category != null) {
+                    _category_regex = new Regex (category, REGEX_COMPILE_OPTIONS);
+                }
+                if (sound_name != null) {
+                    _sound_name_regex = new Regex (sound_name, REGEX_COMPILE_OPTIONS);
+                }
+                if (sound_file != null) {
+                    _sound_file_regex = new Regex (sound_file, REGEX_COMPILE_OPTIONS);
+                }
+            } catch (RegexError e) {
+                stderr.printf ("Failed to compile regex in notification matching: %s\n",
+                               e.message);
+            }
+        }
+
+        private bool match_field (Regex ?regex, string ?value) {
+            if (regex == null) {
+                return false;
+            }
+            if (value == null) {
+                return false;
+            }
+            return regex.match (value, REGEX_MATCH_FLAGS);
+        }
+
+        public virtual bool matches_notification (NotifyParams param) {
+            ensure_regexes ();
+
+            if (app_name != null) {
+                if (!match_field (_app_name_regex, param.app_name)) {
                     return false;
                 }
             }
             if (desktop_entry != null) {
-                if (param.desktop_entry == null) {
-                    return false;
-                }
-                bool result = Regex.match_simple (
-                    desktop_entry, param.desktop_entry,
-                    REGEX_COMPILE_OPTIONS,
-                    REGEX_MATCH_FLAGS);
-                if (!result) {
+                if (!match_field (_desktop_entry_regex, param.desktop_entry)) {
                     return false;
                 }
             }
             if (summary != null) {
-                if (param.summary == null) {
-                    return false;
-                }
-                bool result = Regex.match_simple (
-                    summary, param.summary,
-                    REGEX_COMPILE_OPTIONS,
-                    REGEX_MATCH_FLAGS);
-                if (!result) {
+                if (!match_field (_summary_regex, param.summary)) {
                     return false;
                 }
             }
             if (body != null) {
-                if (param.body == null) {
-                    return false;
-                }
-                bool result = Regex.match_simple (
-                    body, param.body,
-                    0,
-                    REGEX_MATCH_FLAGS);
-                if (!result) {
+                if (!match_field (_body_regex, param.body)) {
                     return false;
                 }
             }
             if (urgency != null) {
-                bool result = Regex.match_simple (
-                    urgency, param.urgency.to_string (),
-                    REGEX_COMPILE_OPTIONS,
-                    REGEX_MATCH_FLAGS);
-                if (!result) {
+                if (!match_field (_urgency_regex, param.urgency.to_string ())) {
                     return false;
                 }
             }
             if (category != null) {
-                if (param.category == null) {
-                    return false;
-                }
-                bool result = Regex.match_simple (
-                    category, param.category,
-                    REGEX_COMPILE_OPTIONS,
-                    REGEX_MATCH_FLAGS);
-                if (!result) {
+                if (!match_field (_category_regex, param.category)) {
                     return false;
                 }
             }
             if (sound_file != null) {
-                if (param.sound_file == null) {
-                    return false;
-                }
-                bool result = Regex.match_simple (
-                    sound_file, param.sound_file,
-                    REGEX_COMPILE_OPTIONS,
-                    REGEX_MATCH_FLAGS);
-                if (!result) {
+                if (!match_field (_sound_file_regex, param.sound_file)) {
                     return false;
                 }
             }
             if (sound_name != null) {
-                if (param.sound_name == null) {
-                    return false;
-                }
-                bool result = Regex.match_simple (
-                    sound_name, param.sound_name,
-                    REGEX_COMPILE_OPTIONS,
-                    REGEX_MATCH_FLAGS);
-                if (!result) {
+                if (!match_field (_sound_name_regex, param.sound_name)) {
                     return false;
                 }
             }
