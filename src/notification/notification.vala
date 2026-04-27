@@ -362,7 +362,7 @@ namespace SwayNotificationCenter {
                         }
                     }
                 } catch (Error e) {
-                    stderr.printf (e.message);
+                    warning ("%s", e.message);
                 }
             }
 
@@ -397,7 +397,7 @@ namespace SwayNotificationCenter {
                     this.body.set_attributes (attr);
                 }
             } catch (Error e) {
-                stderr.printf ("Could not parse Pango markup %s: %s\n",
+                warning ("Could not parse Pango markup %s: %s",
                                text, e.message);
                 // Sets the original text
                 this.body.set_text (text);
